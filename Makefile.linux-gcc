@@ -1,0 +1,41 @@
+# $Id: Makefile,v 1.1.1.1 2008/05/14 07:19:43 root Exp $
+#
+# Makefile
+
+OS=LINUX
+DATABASE=-DDB_TYPE_SQLITE
+CFLAGS=-O2 -DHAS_PROC -DNO_NATIVE_STRLCPY -DNO_SETPROCTITLE ${DATABASE} -Wall -Werror  -ansi -pedantic -std=c99 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -I/usr/local/include
+LDFLAGS=-lsqlite3 -L/usr/local/lib
+DEBUGFLAGS=-ggdb -g3
+
+include	Makefile.common
+
+CFLAGS+= $(DEBUGFLAGS) -DVERSION=\"$(VERSION)\" -D$(OS)
+
+RM=rm
+
+all: $(PROGNAME)
+
+$(PROGNAME): $(OBJECTS) $(HEADERS)
+	$(CC) -o $(PROGNAME) $(OBJECTS) $(LDFLAGS)
+
+clean:
+	-$(RM) -f $(PROGNAME) $(OBJECTS) *.core *.BAK *~ *.pid
+
+clean-all:
+	-$(RM) -f $(PROGNAME) $(OBJECTS) *.core *.BAK *.pid
+
+install-user:
+	mkdir -p $(HOME)/bin
+	mkdir -p $(HOME)/.sysalerter
+	cp sysalert $(HOME)/bin
+	cp sysalertrc $(HOME)/.sysalerter/config
+	cp scripts/*.sh $(HOME)/.sysalerter/
+	echo "Please edit $(HOME)/.sysalerter/config and add $(HOME)/bin to the path in your .profile or .cshrc"
+
+install-system:
+	mkdir -p /etc/sysalerter
+	cp sysalert /usr/bin
+	cp sysalertrc /etc/sysalerter/config
+	cp scripts/*.sh /etc/sysalerter/
+	echo "Please edit /etc/sysalerter/config"

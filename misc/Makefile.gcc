@@ -1,0 +1,15 @@
+OBJS=sqlite3.o sqlite3_64.o
+SRCS=sqlite3.c
+CFLAGS64=-m64
+CFLAGS=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+
+all: ${OBJS}
+
+sqlite3_64.o: 
+	${CC} -c ${SRCS} ${CFLAGS64} -o sqlite3_64.o
+
+sqlite3.o:
+	${CC} -c ${SRCS} ${CFLAGS}
+
+clean:
+	${RM} -f *.o

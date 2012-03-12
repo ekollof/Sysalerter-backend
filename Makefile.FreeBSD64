@@ -1,0 +1,42 @@
+# $Id: Makefile,v 1.1.1.1 2008/05/14 07:19:43 root Exp $
+#
+# Makefile
+
+OS=FREEBSD
+DATABASE=-DDB_TYPE_SQLITE
+CFLAGS=-DHAS_PROC -DNO_UTENT -DWANT_IPV6 -DWANT_LIBWRAP -m64 -O2 ${DATABASE} -Wall -Werror  -ansi -pedantic -std=c99 -I/usr/local/include -I misc
+LDFLAGS=-L /usr/local/lib -pthread -lwrap -lsqlite3 
+DEBUGFLAGS=-ggdb -g3 #-DDONTFORK
+#SQLITE=misc/sqlite3.o
+
+include	Makefile.common
+
+CFLAGS+= $(DEBUGFLAGS) -DVERSION=\"$(VERSION)\" -D$(OS)
+
+RM=rm
+
+all: $(PROGNAME)
+
+$(PROGNAME): $(OBJECTS) $(HEADERS)
+	$(CC) -o $(PROGNAME) $(OBJECTS) $(LDFLAGS) $(SQLITE)
+
+clean:
+	-$(RM) -f $(PROGNAME) $(OBJECTS) *.core *.BAK *~ *.pid
+
+clean-all:
+	-$(RM) -f $(PROGNAME) $(OBJECTS) *.core *.BAK *.pid
+
+install-user:
+	mkdir -p $(HOME)/bin
+	mkdir -p $(HOME)/.sysalerter
+	cp sysalert $(HOME)/bin
+	cp sysalertrc $(HOME)/.sysalerter/config
+	cp scripts/*.sh $(HOME)/.sysalerter/
+	echo "Please edit $(HOME)/.sysalerter/config and add $(HOME)/bin to the path in your .profile or .cshrc"
+
+install-system:
+	mkdir -p /etc/sysalerter
+	cp sysalert /usr/bin
+	cp sysalertrc /etc/sysalerter/config
+	cp scripts/*.sh /etc/sysalerter/
+	echo "Please edit /etc/sysalerter/config"

@@ -1,0 +1,197 @@
+\documentclass[a4paper,10pt,titlepage]{book}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[english]{babel}
+\usepackage{caption}
+\usepackage{fontenc}
+\usepackage{graphicx}
+\usepackage{makeidx}
+\usepackage{mathpazo}
+\usepackage{pst-all}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{listings}
+\usepackage[dvips]{hyperref}
+
+\makeindex
+\makeglossary
+
+\author{Emiel Kollof}
+\title{The care and feeding of the System Alerter suite}
+\date{2009-03-06}
+
+\lstset{
+  breaklines=true,                                     % line wrapping on
+  frame=ltrb,
+  framesep=5pt,
+  basicstyle=\normalsize,
+  stringstyle=\ttfamily,
+  showstringspaces=true
+}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+
+\emph{``Success builds character, failure reveals it''}
+
+
+\section{What is the System Alerter?}
+
+\paragraph
+The System Alerter is a suite of programs that do semi-realtime monitoring. It's main goal is information gathering, quick deployment and ease of use. It's currently in use at the OTL. Installing the System Alerter on a machine should be no harder than just copying over a binary and running it. 
+
+\section{Components of the System Alerter}
+
+\begin{itemize}
+ \item{A Web front end backed by a MySQL database}
+ \item{A script that gets called that fetches data from the System Alerter daemon.}
+ \item{A daemon running on the system that is being monitored which listens on a specified port (default 5432) where other apps can communicate with it and get data. One such a client is the web front-end.}
+\end{itemize}
+
+\section{Components in detail}
+
+\subsection{System alerter daemon}
+
+The system alerter daemon is a program called \texttt{sysalert}. When it is started, it does the following:
+
+\begin{enumerate}
+ \item Look for a configuration file in \texttt{/etc/sysalerter}, if not found, it looks in \verb@${HOME}/.sysalerter@.
+ \item Parse the configfile and incorporate the settings. The format of the configuration file will be talked about in this document later on.
+ \item Fork off a listener and listen for incoming connections.
+ \item Every 120 seconds (this value can be changed in the configuration file) check stats (load average, diskusage, cpu et al) and put them in a local database.
+ \item (if enabled, default it is on) Every 120 seconds (also configurable), fetch an URL which holds the webinterface submit interface. The web interface should connect back and do stuff (like collect the stats database). By fetching this URL, it also registers itself in the web interface.
+ \item When a treshold is reached, it starts a script configured in the configuration. The output is mailed to someone.
+\end{enumerate}
+
+\subsection{Web frontend}
+
+The web front end is a PHP based web application. It is a MVC-based system for ease of development. It is backed by a MySQL database. If you load it up, the first thing that you see is an overview of machines it knows about.
+
+
+\subsection{Submission interface}
+
+Of special interest is \texttt{submit.php} in the web interface root. By default, the system alerter daemon fetches this with a few parameters (and therefore sets it off) and \texttt{submit.php} will connect back and fetch all the information an status info from the system alerter daemon.
+
+\subsection{Management tools}
+
+In the \texttt{bin/} directory in the Web Frontend root, there are some scripts to help you deploy the system alerter daemon on machines and to execute commands on all of them in a serial fashion.
+
+\chapter{System Alerter Daemon}
+
+\emph{``The world has arrived at an age of cheap complex devices of great reliability, and something is bound to come of it''}
+
+\section{What is the System Alerter daemon}
+
+The system alerter daemon is a program written in the venerable C language. By default, it will go into the background and detach from the running terminal. To see what is going on, it can be brought into the foreground, or it will log somewhere, depending on your choice.
+
+\section{Features}
+
+\begin{itemize}
+ \item Small footprint and almost no dependancies. Where possible, the facilities already present by default in the operating system are used.
+ \item Support for Solaris 10 and Linux.
+ \item Easy deployment and easy installation.
+ \item Mail notification when tresholds are exceeded.
+ \item Treshold monitoring for filesystem, load, and cpu usage. More is in the works.
+ \item Simple to configure.
+\end{itemize}
+
+
+\section{Installation}
+
+Installing the system alerter daemon is really simple. One only needs to copy the binary for the right platform somewhere and just run it. It has no weird dependancies, has sane defaults for quick deploying, and if the defaults aren't fine for your setup anymore, you can change them in the source code quite easily.
+
+\section{Compilation and updating}
+
+\subsection{Prerequisites}
+
+I recommend using the Sun Studio compiler, even though GCC should also work. On Linux, there is only support for GCC. SQLite 3 is recommended but not needed (as the system alerter also works fine with the SQLite amalgamation, which is included). Please note that current versions of Solaris already include SQLite 3 or newer. Furthermore, Sun make and GNU make will work. Please make sure eveything needed is in your path.
+
+\subsection{Preparations}
+
+The code for the system alerter daemon is currently held in a Subversion\footnote{A robust version control system, available at \url{http://subversion.tigris.org}} repository. It can be checked out as follows:
+
+\begin{lstlisting}[language=bash,breaklines=true]
+$ svn co svn://172.30.54.153/storage/repository/sysalerter/trunk sysalerter
+\end{lstlisting}
+
+This will give you a \texttt{sysalerter} directory in which the source will be. Change into this directory and have a look. You will find some Makefiles for different architectures and build types. 
+
+A small guide as to which Makefile to use:
+\begin{itemize}
+ \item \texttt{Makefile.solaris-suncc} if you want to compile a 32-bit binary, using the SQLite library present in the system.
+ \item \texttt{Makefile.solaris64-suncc} if you want to compile a 64-bit binary and using the amalgamation, since there is no 64-bit library of SQLite available on Solaris by default.
+ \item \texttt{Makefile.linux-gcc} 32 bit Linux binary, using library SQLite.
+ \item \texttt{Makefile.linux32-gcc-nodynamic} 32-bit Linux binary, using amalgamation.
+ \item \texttt{Makefile.linux64-gcc-nodynamic} 64-bin Linux binary, using amalgamation.
+\end{itemize}
+
+It is advisable to symlink the Makefile you would like to use to Makefile in the source root like so:
+
+\begin{lstlisting}[language=bash]
+$ ln -s Makefile.solaris64-suncc Makefile
+\end{lstlisting}
+
+Otherwise, a makefile can be forced with a flag to \texttt{make} with the \texttt{-f} flag, for example:
+
+\begin{lstlisting}[language=bash]
+$ make -f Makefile.solaris64-suncc
+\end{lstlisting}
+
+\subsubsection{Using the SQLite amalgamation}
+
+The SQLite amalgamation is basically the complete SQLite library implementation in one C-source file and some headers. These can be found in \texttt{misc/} (relative from the source root). If you decided to use the amalgamation, please make sure that you compile it first, before compiling the rest of the project. It has been excluded from the standard build because it's a 2 MB source file and it takes a while to compile. In \texttt{misc/} you will find two Makefiles. One for gcc, and one for Sun Studio. It will try to compile 32- and 64 bit version of the amalgamation. On 32-bit Linux it will probably fail building the 64-bit object. This faillure can be ignored, since with will have build the 32-bit object anyway.
+
+\section{Compiling and Installing}
+
+Once everything is set up, \texttt{make} can be invoked in the source root. It should compile without warnings and errors. If it fails to compile due to something else that could have been caused by incorrect setup, then contact your local sysadmin or someone else who is able to code in C.
+
+Once you are done, you will have a binary called \texttt{sysalert}. Copy it somewhere in your path (e.g. \texttt{/usr/bin}).
+
+\section{Configuration}
+
+The System Alerter Daemon looks for a configuration file in two places, namely in \texttt{/etc/sysalerter} and \texttt{~/.sysalerter}. If a configuration isn't found, it will run with default values, which may or may not be what you want. The configuration file format is very simple. A sample configuration might look like such:
+
+\begin{lstlisting}
+# Config file for sysalerter
+
+# check interval (in seconds)
+interval=20
+
+# load treshold 
+maxload=0.2
+
+# disk
+disk_paths=/
+
+# shellcommand to execute when load event triggered
+# load_shellcommand=/etc/sysalerter/load.sh
+# disk_shellcommand=/etc/sysalerter/disk.sh
+
+# alert only once
+alert_once=1
+
+# mail server configuration
+mailserver=mail.example.org
+mailaddress=user@example.org
+
+# heartbeat configuration
+heartbeat=1
+heartbeat_url=http://www.example.org/submit.php
+heartbeat_interval=120
+\end{lstlisting}
+
+As you can see, it's very straightforward. It's a simple key=value system. Comments should start with a '#'. 
+
+
+\end{document}

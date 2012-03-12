@@ -1,0 +1,11 @@
+# $Id: Makefile.common,v 1.1.1.1 2008/05/14 07:19:43 root Exp $
+#
+# Common things (saves me from editing the template every time)
+
+PROGNAME=sysalert
+VERSION=0.01
+
+SOURCES=main.c vars.c check.c config.c utils.c system.c compat.c kstat.c network.c mail.c ocate.c talk.c solaris.c linux.c freebsd.c sysinfo.c sqlite.c database.c list.c http.c users.c
+HEADERS=sysalert.h config_vars.h ocate.h
+OBJECTS=main.o vars.o check.o config.o utils.o system.o compat.o kstat.o network.o mail.o ocate.o talk.o solaris.o linux.o freebsd.o sysinfo.o sqlite.o database.o list.o http.o users.o
+

@@ -1,0 +1,28 @@
+# Config file for sysalerter
+debug=1
+verbose=1
+
+# check interval (in seconds)
+interval=10
+
+# load treshold 
+maxload=0.2
+
+# disk
+disk_paths=/
+# shellcommand to execute when load event triggered
+#load_shellcommand=/etc/sysalerter/load.sh
+#disk_shellcommand=/etc/sysalerter/disk.sh
+
+# alert only once
+alert_once=1
+
+# mail server configuration
+mailserver=172.30.54.153
+mailaddress=emiel.kollof@gmail.com
+
+# heartbeat configuration
+heartbeat=1
+heartbeat_url=http://localhost/~coolvibe/sysalerter/submit.php
+heartbeat_interval=120
+

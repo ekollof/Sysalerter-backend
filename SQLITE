@@ -1,0 +1,7 @@
+CREATE TABLE status(
+	id INTEGER PRIMARY KEY,
+	status VARCHAR(255),
+	value VARCHAR(8192),
+	alertstatus INTEGER,
+	lastalert DATE
+);
