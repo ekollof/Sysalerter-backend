@@ -34,7 +34,6 @@ mylist_malloc()
 	 * mallocs a node the right size. Don't forget to free it when it
 	 * gets deleted. This saves me some typing :)
 	 */
-
 	return (node *) malloc(sizeof(node));
 }
 
