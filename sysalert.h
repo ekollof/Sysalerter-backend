@@ -15,11 +15,8 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#ifndef _BSD_SOURCE
-#define _BSD_SOURCE
-#endif
-#ifndef _SVID_SOURCE
-#define _SVID_SOURCE
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
 #endif
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
@@ -29,7 +26,7 @@
 
 #ifdef SOLARIS
 #define LASTLOG "/var/adm/lastlog"
-#else 
+#else
 #define LASTLOG "/var/log/lastlog"
 #endif
 
@@ -112,16 +109,16 @@ typedef void    (*client_hndlr) (int);
 
 /* prototypes */
 struct status {
-	int             alert_load;
-	int             alert_disk;
-	int             alert_cpu;
+    int             alert_load;
+    int             alert_disk;
+    int             alert_cpu;
 };
 
 /* linked list stuff because I hate dealing with arrays */
 struct linked_list {
-	char           *data;
-	struct linked_list *next;
-	struct linked_list *prev;
+    char           *data;
+    struct linked_list *next;
+    struct linked_list *prev;
 }               item;
 
 typedef struct linked_list node;
@@ -129,42 +126,42 @@ typedef unsigned long long counter_t;
 
 /* process structure */
 struct process {
-	pid_t           ppid;
-	char            pargv[1024];
-	size_t          procsize;
+    pid_t           ppid;
+    char            pargv[1024];
+    size_t          procsize;
 };
 
 
 struct cpu_state {
-	counter_t       user;
-	counter_t       syst;
-	counter_t       idle;
-	counter_t       iowait;
-	counter_t       swap;
-	counter_t       total;
+    counter_t       user;
+    counter_t       syst;
+    counter_t       idle;
+    counter_t       iowait;
+    counter_t       swap;
+    counter_t       total;
 };
 
 struct cpu_state_pct {
-	float           user;
-	float           syst;
-	float           idle;
-	float           iowait;
-	float           swap;
-	float           total;
+    float           user;
+    float           syst;
+    float           idle;
+    float           iowait;
+    float           swap;
+    float           total;
 };
 
 struct webaddr {
-	char		host[255];
-	char		proto[10];
-	int		port;
-	char		path[MAXPATHLEN];
+    char        host[255];
+    char        proto[10];
+    int     port;
+    char        path[MAXPATHLEN];
 };
 
 struct person {
-	char		*name;
-	uid_t		uid;
-	char		*pty;
-	char		*where;
+    char        *name;
+    uid_t       uid;
+    char        *pty;
+    char        *where;
 };
 
 extern struct cpu_state cputhen, cpunow, cpudiff;
@@ -173,7 +170,7 @@ extern struct cpu_state cputhen, cpunow, cpudiff;
 extern char    *optarg;
 extern int      optind, opterr, optopt;
 extern char     configfile[MAXPATHLEN];
-extern char	logfile[MAXPATHLEN];
+extern char logfile[MAXPATHLEN];
 extern int      nodaemon;
 extern int      verbose;
 extern int      debug;
@@ -188,7 +185,7 @@ extern int      logging;
 extern kstat_ctl_t *kc;
 extern kstat_t        *cpuksp[MAXCPUS];
 extern kstat_t        *ksp_chain;
-extern kid_t	       kid;
+extern kid_t           kid;
 #endif
 
 extern char     load_shellcommand[1024];
@@ -279,7 +276,7 @@ extern char    *strdup(char *buf);
 #ifdef SOLARIS
 /* kstat.c */
 extern void     ks_init(void);
-extern void 	ks_chain_update(kstat_ctl_t * kc);
+extern void     ks_chain_update(kstat_ctl_t * kc);
 #endif
 #ifdef NO_UTENT
 extern struct utmp * getutent(void);
@@ -298,7 +295,7 @@ extern void     network_mainloop(client_hndlr clientfunc);
 extern int      network_init(struct sockaddr_in * local, socklen_t llen);
 extern void
 network_setaddress(char *host, char *service,
-		   struct sockaddr_in * sap);
+        struct sockaddr_in * sap);
 extern int      network_connect(char *hname, char *sname);
 extern int      network_send(int fd, char *buf);
 extern int      nprintf(int sock, char *fmt,...);

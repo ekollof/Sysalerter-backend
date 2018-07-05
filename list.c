@@ -9,16 +9,6 @@
  * should meet one day.
  */
 
-#ifndef lint
-static const char copyright[] =
-"Copyright (c) 2003 Emiel Kollof <coolvibe@hackerheaven.org>";
-#endif
-
-#ifndef lint
-static const char rcsid[] =
-"$Id: list.c,v 1.3 2003/09/03 17:53:44 coolvibe Exp $";
-#endif
-
 #include "sysalert.h"
 
 /*

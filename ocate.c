@@ -32,14 +32,6 @@
  * $Id: ocate.c,v 1.1 2004/05/09 13:15:51 coolvibe Exp $
  */
 
-#ifndef lint
-static const char copyright[] = "This program is using Ocate. This means that the person that coded this program is both smart _and_ lazy. Copyright (c) 2004 Emiel Kollof <coolvibe@hackerheaven.org>";
-#endif
-
-#ifndef lint
-static const char rcsid[] = "$Id: ocate.c,v 1.1 2004/05/09 13:15:51 coolvibe Exp $";
-#endif
-
 #define _GNU_SOURCE
 
 #include "ocate.h"
@@ -51,155 +43,155 @@ static const char rcsid[] = "$Id: ocate.c,v 1.1 2004/05/09 13:15:51 coolvibe Exp
 #endif
 
 
-char           *
+    char           *
 ntoip(struct in_addr * addr)
 {
-	char           *buf = NULL;
+    char           *buf = NULL;
 
-	inet_ntop(AF_INET, &addr, buf, 256);
-	if (buf == NULL) {
-		perror("inet_pton");
-		return NULL;
-	}
-	return buf;
+    inet_ntop(AF_INET, &addr, buf, 256);
+    if (buf == NULL) {
+        perror("inet_pton");
+        return NULL;
+    }
+    return buf;
 }
 
 #ifdef WANT_IPV6
-char           *
+    char           *
 ntoip6(struct in6_addr * addr)
 {
-	char           *buf = NULL;
+    char           *buf = NULL;
 
-	inet_ntop(AF_INET6, &addr, buf, 256);
-	if (buf == NULL) {
-		perror("inet_pton");
-		return NULL;
-	}
-	return buf;
+    inet_ntop(AF_INET6, &addr, buf, 256);
+    if (buf == NULL) {
+        perror("inet_pton");
+        return NULL;
+    }
+    return buf;
 }
 #endif
 
-struct in_addr *
+    struct in_addr *
 ipton(char *host)
 {
-	struct in_addr *in;
+    struct in_addr *in;
 
-	in = (struct in_addr *) malloc(sizeof(struct in_addr));
+    in = (struct in_addr *) malloc(sizeof(struct in_addr));
 
-	inet_pton(AF_INET, host, in);
+    inet_pton(AF_INET, host, in);
 
-	return (struct in_addr *) in;
+    return (struct in_addr *) in;
 }
 
 #ifdef WANT_IPV6
-struct in6_addr *
+    struct in6_addr *
 ip6ton(char *host)
 {
-	struct in6_addr *in;
+    struct in6_addr *in;
 
-	in = (struct in6_addr *) malloc(sizeof(struct in6_addr));
+    in = (struct in6_addr *) malloc(sizeof(struct in6_addr));
 
-	inet_pton(AF_INET6, host, in);
+    inet_pton(AF_INET6, host, in);
 
-	return (struct in6_addr *) in;
+    return (struct in6_addr *) in;
 }
 #endif
 
-char           *
+    char           *
 iptohost(char *ipnum)
 {
-	struct hostent *hent;
-	struct in_addr  in;
-	char           *buf;
-	int             ret;
+    struct hostent *hent;
+    struct in_addr  in;
+    char           *buf;
+    int             ret;
 
-	memcpy(&in, ipton(ipnum), sizeof(in));
-	hent = gethostbyaddr((const char *) &in, sizeof(in), AF_INET);
+    memcpy(&in, ipton(ipnum), sizeof(in));
+    hent = gethostbyaddr((const char *) &in, sizeof(in), AF_INET);
 
-	if (hent == NULL) {
-		herror("iptohost");
-		return NULL;
-	}
-	ret = asprintf(&buf, "%s", hent->h_name);
-	if (ret < 0) {
-		perror("ocate.c: iptohost: asprintf error");
-		return NULL;
-	}
-	return buf;
+    if (hent == NULL) {
+        herror("iptohost");
+        return NULL;
+    }
+    ret = asprintf(&buf, "%s", hent->h_name);
+    if (ret < 0) {
+        perror("ocate.c: iptohost: asprintf error");
+        return NULL;
+    }
+    return buf;
 }
 
 #ifdef WANT_IPV6
-char           *
+    char           *
 ip6tohost(char *ipnum)
 {
-	struct hostent *hent;
-	struct in6_addr in;
-	char           *buf;
+    struct hostent *hent;
+    struct in6_addr in;
+    char           *buf;
 
-	memcpy(&in, ip6ton(ipnum), sizeof(in));
-	hent = gethostbyaddr((const char *) &in, sizeof(in), AF_INET6);
+    memcpy(&in, ip6ton(ipnum), sizeof(in));
+    hent = gethostbyaddr((const char *) &in, sizeof(in), AF_INET6);
 
-	if (hent == NULL) {
-		herror("ip6tohost");
-		return NULL;
-	}
-	asprintf(&buf, "%s", hent->h_name);
+    if (hent == NULL) {
+        herror("ip6tohost");
+        return NULL;
+    }
+    asprintf(&buf, "%s", hent->h_name);
 
-	return buf;
+    return buf;
 }
 #endif
 
-char           *
+    char           *
 htoip(char *host)
 {
-	struct sockaddr_in sap;
-	struct hostent *hent;
-	char           *buf;
-	int             ret;
+    struct sockaddr_in sap;
+    struct hostent *hent;
+    char           *buf;
+    int             ret;
 
-	hent = gethostbyname(host);
+    hent = gethostbyname(host);
 
-	if (hent == NULL) {
-		herror("htoip");
-		return NULL;
-	}
-	sap.sin_addr = *(struct in_addr *) hent->h_addr_list[0];
+    if (hent == NULL) {
+        herror("htoip");
+        return NULL;
+    }
+    sap.sin_addr = *(struct in_addr *) hent->h_addr_list[0];
 
-	ret = asprintf(&buf, "%s", inet_ntoa(sap.sin_addr));
-	if (ret < 0) {
-		perror("ocate.c: htoip: asprintf error");
-		return NULL;
-	}
-	return buf;
+    ret = asprintf(&buf, "%s", inet_ntoa(sap.sin_addr));
+    if (ret < 0) {
+        perror("ocate.c: htoip: asprintf error");
+        return NULL;
+    }
+    return buf;
 }
 
 #ifdef WANT_IPV6
-char           *
+    char           *
 htoip6(char *host)
 {
-	struct sockaddr_in6 sap;
-	struct hostent *hent;
-	char           *buf = NULL;
+    struct sockaddr_in6 sap;
+    struct hostent *hent;
+    char           *buf = NULL;
 
-	hent = gethostbyname2(host, AF_INET6);
-	if (hent == NULL) {
-		herror("htoip6");
-		return NULL;
-	}
-	sap.sin6_addr = *(struct in6_addr *) hent->h_addr_list[0];
+    hent = gethostbyname2(host, AF_INET6);
+    if (hent == NULL) {
+        herror("htoip6");
+        return NULL;
+    }
+    sap.sin6_addr = *(struct in6_addr *) hent->h_addr_list[0];
 
-	/* better too much than too little, eh? */
-	buf = (char *) malloc(256);
-	if (buf == NULL) {
-		perror("malloc");
-		return NULL;
-	}
-	inet_ntop(AF_INET6, &sap.sin6_addr, buf, 255);
+    /* better too much than too little, eh? */
+    buf = (char *) malloc(256);
+    if (buf == NULL) {
+        perror("malloc");
+        return NULL;
+    }
+    inet_ntop(AF_INET6, &sap.sin6_addr, buf, 255);
 
-	if (buf == NULL) {
-		perror("inet_ntop");
-		return NULL;
-	}
-	return buf;
+    if (buf == NULL) {
+        perror("inet_ntop");
+        return NULL;
+    }
+    return buf;
 }
 #endif

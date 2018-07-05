@@ -1,0 +1,8 @@
+{
+    "C_Cpp.dimInactiveRegions": false,
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "C_Cpp.errorSquiggles": "Enabled",
+    "files.associations": {
+        "sysalert.h": "c"
+    }
+}
